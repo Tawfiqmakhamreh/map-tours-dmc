@@ -1,4 +1,4 @@
-# �️ Map Tours DMC - Progressive Web App
+# �️ Map Tours DMC - App
 
 <div align="center">
 
