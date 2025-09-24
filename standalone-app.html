@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Map Tours - DMC">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="background-color" content="#FF6B35">
+    <meta name="msapplication-navbutton-color" content="#FF6B35">
+    
+    <!-- PWA Display -->
+    <meta name="display-mode" content="standalone">
+    <meta name="orientation" content="portrait">
+    
+    <title>Map Tours - DMC</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./standalone-manifest.json">
+    
+    <!-- Icons for different platforms -->
+    <link rel="apple-touch-icon" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    <link rel="shortcut icon" href="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Arabic', Arial, sans-serif;
+            background: #000;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            position: relative;
+            --safe-area-inset-top: env(safe-area-inset-top);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+            --safe-area-inset-left: env(safe-area-inset-left);
+            --safe-area-inset-right: env(safe-area-inset-right);
+        }
+        
+        .app-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--safe-area-inset-top);
+            padding-bottom: var(--safe-area-inset-bottom);
+            padding-left: var(--safe-area-inset-left);
+            padding-right: var(--safe-area-inset-right);
+        }
+        
+        .website-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            flex: 1;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            transition: opacity 0.5s ease;
+            padding-top: var(--safe-area-inset-top);
+            padding-bottom: var(--safe-area-inset-bottom);
+        }
+        
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 40px;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            animation: logoFloat 2s ease-in-out infinite alternate;
+            padding: 15px;
+        }
+        
+        .loading-logo img {
+            width: 90px;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        @keyframes logoFloat {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-10px) scale(1.05); }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .loading-subtext {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            color: white;
+            padding: 20px;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            padding-bottom: calc(20px + var(--safe-area-inset-bottom));
+            display: block;
+        }
+        
+        .install-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .install-text {
+            flex: 1;
+            margin-right: 15px;
+        }
+        
+        .install-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .install-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .install-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .install-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .install-btn.primary {
+            background: white;
+            color: #FF6B35;
+            animation: pulse 2s infinite;
+        }
+        
+        .install-btn.secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .install-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            padding-bottom: var(--safe-area-inset-bottom);
+        }
+        
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #FF6B35;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .fab:hover, .fab:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.6);
+        }
+        
+        .progress-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #FF6B35, #F7931E);
+            z-index: 1002;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .loading-logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 30px;
+            }
+            
+            .loading-text {
+                font-size: 24px;
+            }
+            
+            .loading-subtext {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+            
+            .fab {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+        
+        /* Slide down animation for notifications */
+        @keyframes slideDown {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .notification {
+            animation: slideDown 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Progress indicator -->
+        <div class="progress-line" id="progressLine"></div>
+        
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-logo">
+                <img src="https://www.map-tours.com/wp-content/uploads/2019/05/Map-logo-6cm.png" alt="Map Tours Logo">
+            </div>
+            <div class="loading-text">Map Tours - DMC</div>
+            <div class="loading-subtext">تجربتك الفريدة تبدأ من هنا</div>
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <!-- Main iframe -->
+        <iframe 
+            id="websiteFrame"
+            class="website-frame"
+            src=""
+            onload="handleLoad()"
+            onerror="handleError()"
+            allow="geolocation; camera; microphone; payment; encrypted-media; autoplay; fullscreen"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals allow-downloads">
+        </iframe>
+        
+        <!-- Install prompt - Always visible -->
+        <div class="install-prompt" id="installPrompt">
+            <div class="install-content">
+                <div class="install-text">
+                    <div class="install-title">تثبيت التطبيق</div>
+                    <div class="install-desc">أضف إلى الشاشة الرئيسية للوصول السريع</div>
+                </div>
+                <div class="install-buttons">
+                    <button class="install-btn primary" onclick="installApp()">تثبيت الآن</button>
+                    <button class="install-btn secondary" onclick="dismissInstall()">لاحقاً</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Action Buttons -->
+        <div class="fab-container">
+            <button class="fab" onclick="goHome()" title="الرئيسية">🏠</button>
+            <button class="fab" onclick="refreshApp()" title="تحديث">🔄</button>
+        </div>
+    </div>
+
+    <script>
+        console.log('📱 Map Tours - DMC Standalone App Starting...');
+        
+        // App state
+        let deferredPrompt;
+        let isLoaded = false;
+        
+        // UI elements
+        const UI = {
+            frame: document.getElementById('websiteFrame'),
+            loading: document.getElementById('loadingOverlay'),
+            progress: document.getElementById('progressLine'),
+            installPrompt: document.getElementById('installPrompt')
+        };
+        
+        // Auto-show install prompt
+        function showInstallPrompt() {
+            console.log('📱 Showing install prompt');
+            UI.installPrompt.style.display = 'block';
+            
+            // Also show top notification for mobile users
+            showInstallNotification();
+        }
+        
+        // Show prominent install notification
+        function showInstallNotification() {
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #4CAF50, #45a049);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+                    z-index: 1001;
+                    text-align: center;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="font-size: 20px; margin-bottom: 10px;">📱</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">
+                        مرحباً! هذا تطبيق Map Tours - DMC
+                    </div>
+                    <div style="font-size: 14px; margin-bottom: 15px; opacity: 0.9;">
+                        اضغط "تثبيت الآن" بالأسفل لإضافته لشاشتك الرئيسية
+                    </div>
+                    <button onclick="this.parentElement.remove(); installApp();" style="
+                        background: white;
+                        color: #4CAF50;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin-right: 8px;
+                    ">⬇ تثبيت</button>
+                    <button onclick="this.parentElement.remove();" style="
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">✕ إغلاق</button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto remove after 10 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 10000);
+            }
+        }
+        
+        // PWA Installation handler
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        
+        // Check if PWA is installed
+        function isPWAInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone ||
+                   document.referrer.includes('android-app://');
+        }
+        
+        // Install app
+        async function installApp() {
+            console.log('🚀 Install button clicked');
+            
+            if (deferredPrompt) {
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    
+                    if (outcome === 'accepted') {
+                        console.log('✅ PWA installation accepted');
+                        showNotification('تم التثبيت!', 'success');
+                        UI.installPrompt.style.display = 'none';
+                    } else {
+                        console.log('❌ PWA installation dismissed');
+                        showManualInstructions();
+                    }
+                    
+                    deferredPrompt = null;
+                    
+                } catch (error) {
+                    console.error('❌ Installation error:', error);
+                    showManualInstructions();
+                }
+            } else {
+                showManualInstructions();
+            }
+        }
+        
+        // Show manual install instructions
+        function showManualInstructions() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            let instructions = '';
+            if (isIOS) {
+                instructions = `📱 لتثبيت التطبيق على iPhone/iPad:
+
+1. اضغط على زر المشاركة 🔗 في Safari
+2. مرر لأسفل واختر "إضافة إلى الشاشة الرئيسية" 
+3. اضغط "إضافة" في الزاوية العلوية اليمنى
+4. التطبيق سيظهر في الشاشة الرئيسية!`;
+            } else if (isAndroid) {
+                instructions = `📱 لتثبيت التطبيق على Android:
+
+1. اضغط على القائمة (⋮) في Chrome
+2. اختر "إضافة إلى الشاشة الرئيسية" أو "تثبيت التطبيق"
+3. اضغط "إضافة" أو "تثبيت"
+4. التطبيق سيُضاف للشاشة الرئيسية!`;
+            } else {
+                instructions = `💻 لتثبيت التطبيق:
+
+• Chrome: القائمة ← تثبيت التطبيق
+• Edge: القائمة ← التطبيقات ← تثبيت
+• Safari: مشاركة ← إضافة للشاشة الرئيسية`;
+            }
+            
+            alert(instructions);
+        }
+        
+        // Dismiss install prompt
+        function dismissInstall() {
+            UI.installPrompt.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+                UI.installPrompt.style.display = 'none';
+            }, 300);
+            localStorage.setItem('installDismissed', Date.now());
+        }
+        
+        // Initialize application
+        function init() {
+            console.log('🚀 Initializing Standalone App...');
+            
+            isLoaded = false;
+            UI.loading.style.display = 'flex';
+            setProgress(10);
+            
+            // Show install prompt immediately for mobile
+            setTimeout(() => {
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile && !isPWAInstalled()) {
+                    showInstallPrompt();
+                }
+            }, 2000);
+            
+            // Start loading
+            loadWebsite();
+            
+            // Force completion timeout
+            setTimeout(() => {
+                if (!isLoaded) {
+                    completeLoading();
+                }
+            }, 3000);
+        }
+        
+        // Load website
+        function loadWebsite() {
+            console.log('📡 Loading Map Tours website...');
+            setProgress(30);
+            
+            // Progress animation
+            let progress = 30;
+            const progressInterval = setInterval(() => {
+                progress += 15;
+                if (progress <= 90) {
+                    setProgress(progress);
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 100);
+            
+            // Load website
+            UI.frame.src = 'https://www.map-tours.com';
+        }
+        
+        // Handle successful load
+        function handleLoad() {
+            console.log('✅ Website loaded successfully');
+            completeLoading();
+        }
+        
+        // Handle load error
+        function handleError() {
+            console.error('❌ Failed to load website');
+            showNotification('فشل في التحميل - تحقق من الاتصال', 'error');
+        }
+        
+        // Complete loading
+        function completeLoading() {
+            if (isLoaded) return;
+            
+            console.log('✅ Loading completed');
+            isLoaded = true;
+            
+            setProgress(100);
+            UI.loading.style.display = 'none';
+            
+            setTimeout(() => {
+                setProgress(0);
+            }, 800);
+        }
+        
+        // App functions
+        function refreshApp() {
+            console.log('🔄 Refreshing app...');
+            isLoaded = false;
+            UI.loading.style.display = 'flex';
+            
+            const timestamp = Date.now();
+            UI.frame.src = 'https://www.map-tours.com?refresh=' + timestamp;
+            
+            setTimeout(() => {
+                if (!isLoaded) completeLoading();
+            }, 5000);
+        }
+        
+        function goHome() {
+            console.log('🏠 Going to home...');
+            UI.frame.src = 'https://www.map-tours.com';
+        }
+        
+        function setProgress(percent) {
+            UI.progress.style.width = Math.min(Math.max(percent, 0), 100) + '%';
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const colors = {
+                success: '#4CAF50',
+                error: '#F44336',
+                info: '#2196F3'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                z-index: 1000;
+                font-weight: bold;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+        
+        // App lifecycle events
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA was successfully installed');
+            showNotification('تم تثبيت التطبيق بنجاح!', 'success');
+            UI.installPrompt.style.display = 'none';
+        });
+        
+        // Initialize app on load
+        window.addEventListener('load', () => {
+            console.log('📱 Standalone app loaded, initializing...');
+            init();
+        });
+        
+        console.log('🎉 Map Tours Standalone App Script Loaded');
+    </script>
+</body>
+</html>
